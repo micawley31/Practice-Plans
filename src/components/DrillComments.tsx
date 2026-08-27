@@ -4,19 +4,18 @@ import type { DrillComment } from "../types";
 
 interface Props {
   comments: DrillComment[];
-  onAdd: (text: string, author?: string) => void;
+  onAdd: (text: string) => void;
   onDelete: (commentId: string) => void;
 }
 
 export function DrillComments({ comments, onAdd, onDelete }: Props) {
   const [text, setText] = useState("");
-  const [author, setAuthor] = useState(() => db.getCommenterName());
+  const activeProfile = db.getActiveProfile();
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!text.trim()) return;
-    db.setCommenterName(author.trim());
-    onAdd(text.trim(), author.trim() || undefined);
+    onAdd(text.trim());
     setText("");
   }
 
@@ -54,15 +53,7 @@ export function DrillComments({ comments, onAdd, onDelete }: Props) {
       )}
       <form className="form" onSubmit={handleSubmit}>
         <label className="field">
-          <span>Name (optional)</span>
-          <input
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            placeholder="Coach Alex"
-          />
-        </label>
-        <label className="field">
-          <span>Add a comment</span>
+          <span>Add a comment (posting as {activeProfile.name})</span>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}

@@ -55,9 +55,9 @@ export function Library() {
     if (updated) setDetailDrill(updated);
   }
 
-  function handleAddComment(text: string, author?: string) {
+  function handleAddComment(text: string) {
     if (!detailDrill) return;
-    const updated = db.addComment(detailDrill.id, text, author);
+    const updated = db.addComment(detailDrill.id, text);
     refresh();
     if (updated) setDetailDrill(updated);
   }

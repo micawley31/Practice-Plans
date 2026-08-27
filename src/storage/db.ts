@@ -5,12 +5,13 @@ import type {
   DrillInput,
   PracticePlan,
   PracticePlanInput,
+  Profile,
 } from "../types";
 
 const DRILLS_KEY = "practice-plans:drills";
 const PLANS_KEY = "practice-plans:plans";
-const RATER_KEY = "practice-plans:raterId";
-const COMMENTER_KEY = "practice-plans:commenterName";
+const PROFILES_KEY = "practice-plans:profiles";
+const ACTIVE_PROFILE_KEY = "practice-plans:activeProfileId";
 
 function makeId(): string {
   return crypto.randomUUID();
@@ -107,23 +108,43 @@ export function deleteDrill(id: string): void {
   writeJson(PLANS_KEY, plans);
 }
 
-// The app has no accounts yet, so ratings and "who commented" are tracked
-// per-browser via a stable id/name stashed in localStorage.
-export function getRaterId(): string {
-  let id = localStorage.getItem(RATER_KEY);
-  if (!id) {
-    id = makeId();
-    localStorage.setItem(RATER_KEY, id);
-  }
-  return id;
+// No backend/auth yet: "accounts" are local profiles a person names
+// themselves, switchable from the navbar and stashed in localStorage.
+// Ratings key off the active profile's id; comments snapshot its name.
+function ensureProfile(): void {
+  if (localStorage.getItem(PROFILES_KEY)) return;
+  const profile: Profile = { id: makeId(), name: "Coach 1", createdAt: Date.now() };
+  writeJson(PROFILES_KEY, [profile]);
+  localStorage.setItem(ACTIVE_PROFILE_KEY, profile.id);
 }
 
-export function getCommenterName(): string {
-  return localStorage.getItem(COMMENTER_KEY) ?? "";
+export function getProfiles(): Profile[] {
+  ensureProfile();
+  return readJson<Profile[]>(PROFILES_KEY, []);
 }
 
-export function setCommenterName(name: string): void {
-  if (name) localStorage.setItem(COMMENTER_KEY, name);
+export function getActiveProfile(): Profile {
+  const profiles = getProfiles();
+  const activeId = localStorage.getItem(ACTIVE_PROFILE_KEY);
+  return profiles.find((p) => p.id === activeId) ?? profiles[0];
+}
+
+export function setActiveProfile(id: string): void {
+  localStorage.setItem(ACTIVE_PROFILE_KEY, id);
+}
+
+export function createProfile(name: string): Profile {
+  const profile: Profile = { id: makeId(), name, createdAt: Date.now() };
+  const profiles = getProfiles();
+  profiles.push(profile);
+  writeJson(PROFILES_KEY, profiles);
+  setActiveProfile(profile.id);
+  return profile;
+}
+
+export function renameProfile(id: string, name: string): void {
+  const profiles = getProfiles().map((p) => (p.id === id ? { ...p, name } : p));
+  writeJson(PROFILES_KEY, profiles);
 }
 
 export function rateDrill(id: string, score: number): Drill | undefined {
@@ -132,7 +153,7 @@ export function rateDrill(id: string, score: number): Drill | undefined {
   if (idx === -1) return undefined;
   const updated: Drill = {
     ...drills[idx],
-    ratings: { ...drills[idx].ratings, [getRaterId()]: score },
+    ratings: { ...drills[idx].ratings, [getActiveProfile().id]: score },
     updatedAt: Date.now(),
   };
   drills[idx] = updated;
@@ -140,15 +161,16 @@ export function rateDrill(id: string, score: number): Drill | undefined {
   return updated;
 }
 
-export function addComment(
-  drillId: string,
-  text: string,
-  author?: string
-): Drill | undefined {
+export function addComment(drillId: string, text: string): Drill | undefined {
   const drills = getDrills();
   const idx = drills.findIndex((d) => d.id === drillId);
   if (idx === -1) return undefined;
-  const comment: DrillComment = { id: makeId(), text, author, createdAt: Date.now() };
+  const comment: DrillComment = {
+    id: makeId(),
+    text,
+    author: getActiveProfile().name,
+    createdAt: Date.now(),
+  };
   const updated: Drill = { ...drills[idx], comments: [...drills[idx].comments, comment] };
   drills[idx] = updated;
   writeJson(DRILLS_KEY, drills);

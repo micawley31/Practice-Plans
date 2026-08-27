@@ -24,6 +24,12 @@ export interface DrillComment {
   createdAt: number;
 }
 
+export interface Profile {
+  id: string;
+  name: string;
+  createdAt: number;
+}
+
 export interface Drill {
   id: string;
   name: string;

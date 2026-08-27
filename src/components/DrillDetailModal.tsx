@@ -11,7 +11,7 @@ interface Props {
   onEdit: () => void;
   onDelete: () => void;
   onRate: (score: number) => void;
-  onAddComment: (text: string, author?: string) => void;
+  onAddComment: (text: string) => void;
   onDeleteComment: (commentId: string) => void;
   action?: { label: string; onClick: (drill: Drill) => void };
 }
@@ -27,7 +27,7 @@ export function DrillDetailModal({
   action,
 }: Props) {
   const { average, count } = getAverageRating(drill);
-  const myRating = getMyRating(drill, db.getRaterId());
+  const myRating = getMyRating(drill, db.getActiveProfile().id);
 
   return (
     <Modal title={drill.name} onClose={onClose}>
