@@ -52,19 +52,35 @@ export type DrillInput = Omit<
   "id" | "createdAt" | "updatedAt" | "ratings" | "comments"
 >;
 
-export interface PlanDrill {
-  planDrillId: string;
+/** One drill running on one court/station within a time block. */
+export interface PlanTrack {
+  trackId: string;
+  label: string;
   drillId: string;
   duration: number;
   notes?: string;
+}
+
+/**
+ * A slice of the schedule. Every track in a segment runs at the same time —
+ * multiple tracks means multiple courts running different drills in
+ * parallel — and the segment's length is the longest of its tracks, since
+ * the whole team regroups once every court is done.
+ */
+export interface PlanSegment {
+  segmentId: string;
+  tracks: PlanTrack[];
 }
 
 export interface PracticePlan {
   id: string;
   name: string;
   date?: string;
+  /** 24h "HH:MM", from an <input type="time">. */
+  startTime?: string;
+  endTime?: string;
   notes?: string;
-  drills: PlanDrill[];
+  segments: PlanSegment[];
   favorite: boolean;
   createdAt: number;
   updatedAt: number;

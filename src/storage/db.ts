@@ -13,7 +13,7 @@ const PLANS_KEY = "practice-plans:plans";
 const PROFILES_KEY = "practice-plans:profiles";
 const ACTIVE_PROFILE_KEY = "practice-plans:activeProfileId";
 
-function makeId(): string {
+export function makeId(): string {
   return crypto.randomUUID();
 }
 
@@ -42,8 +42,31 @@ function normalizeDrill(d: Drill): Drill {
   };
 }
 
-function normalizePlan(p: PracticePlan): PracticePlan {
-  return { ...p, favorite: p.favorite ?? false };
+// Plans saved before branching support used a flat `drills` list instead of
+// `segments`; migrate each old entry into its own single-track segment.
+interface LegacyPlanDrill {
+  planDrillId: string;
+  drillId: string;
+  duration: number;
+  notes?: string;
+}
+
+function normalizePlan(raw: PracticePlan & { drills?: LegacyPlanDrill[] }): PracticePlan {
+  const segments =
+    raw.segments ??
+    (raw.drills ?? []).map((d) => ({
+      segmentId: d.planDrillId,
+      tracks: [
+        {
+          trackId: d.planDrillId,
+          label: "Court 1",
+          drillId: d.drillId,
+          duration: d.duration,
+          notes: d.notes,
+        },
+      ],
+    }));
+  return { ...raw, segments, favorite: raw.favorite ?? false };
 }
 
 function ensureSeeded(): void {
@@ -103,7 +126,9 @@ export function deleteDrill(id: string): void {
 
   const plans = getPlans().map((p) => ({
     ...p,
-    drills: p.drills.filter((pd) => pd.drillId !== id),
+    segments: p.segments
+      .map((seg) => ({ ...seg, tracks: seg.tracks.filter((t) => t.drillId !== id) }))
+      .filter((seg) => seg.tracks.length > 0),
   }));
   writeJson(PLANS_KEY, plans);
 }
@@ -237,6 +262,3 @@ export function toggleFavoritePlan(id: string): PracticePlan | undefined {
   return updated;
 }
 
-export function makePlanDrillId(): string {
-  return makeId();
-}

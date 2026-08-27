@@ -548,35 +548,104 @@ body {
   padding: 16px;
 }
 
-.plan-drill-list {
+.schedule-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+
+.schedule-summary-over {
+  border-color: var(--color-danger);
+  color: var(--color-danger-dark);
+}
+
+.schedule-summary-exact {
+  border-color: #10b981;
+  color: #047857;
+}
+
+.plan-segment-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
-.plan-drill-item {
-  display: flex;
-  gap: 10px;
+.plan-segment {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 12px;
-  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.plan-drill-order {
+.plan-segment-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.plan-segment-order {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.plan-drill-body {
+.plan-segment-time {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   flex: 1;
+}
+
+.plan-segment-title {
+  font-weight: 700;
+}
+
+.plan-segment-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.plan-track-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.plan-track {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.plan-track-label {
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: var(--color-surface);
+  width: fit-content;
 }
 
 @media (max-width: 900px) {

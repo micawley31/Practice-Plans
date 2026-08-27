@@ -2,9 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as db from "../storage/db";
 import type { PracticePlan } from "../types";
+import { computeSchedule, formatClock, parseTimeToMinutes } from "../utils/schedule";
 
-function totalDuration(plan: PracticePlan): number {
-  return plan.drills.reduce((sum, d) => sum + d.duration, 0);
+function drillCount(plan: PracticePlan): number {
+  return plan.segments.reduce((sum, seg) => sum + seg.tracks.length, 0);
+}
+
+function timeWindowLabel(plan: PracticePlan): string | undefined {
+  if (!plan.startTime || !plan.endTime) return undefined;
+  const start = parseTimeToMinutes(plan.startTime);
+  const end = parseTimeToMinutes(plan.endTime);
+  if (start === undefined || end === undefined) return undefined;
+  return `${formatClock(start)} – ${formatClock(end)}`;
 }
 
 export function Plans() {
@@ -40,35 +49,40 @@ export function Plans() {
         </p>
       ) : (
         <div className="plan-list">
-          {plans.map((plan) => (
-            <div className="plan-list-item" key={plan.id}>
-              <button
-                type="button"
-                className={plan.favorite ? "btn-icon fav-active" : "btn-icon"}
-                onClick={() => handleToggleFavorite(plan)}
-                aria-label={plan.favorite ? "Remove from favorites" : "Add to favorites"}
-              >
-                {plan.favorite ? "★" : "☆"}
-              </button>
-              <button
-                type="button"
-                className="plan-list-main"
-                onClick={() => navigate(`/plans/${plan.id}`)}
-              >
-                <div className="drill-card-header">
-                  <span className="drill-card-name">{plan.name}</span>
-                  {plan.date && <span className="badge">{plan.date}</span>}
-                </div>
-                <div className="drill-card-meta">
-                  <span>⏱ {totalDuration(plan)} min total</span>
-                  <span>📋 {plan.drills.length} drills</span>
-                </div>
-              </button>
-              <button type="button" className="btn btn-danger" onClick={() => handleDelete(plan)}>
-                Delete
-              </button>
-            </div>
-          ))}
+          {plans.map((plan) => {
+            const totalMinutes = computeSchedule(plan.segments).totalMinutes;
+            const window = timeWindowLabel(plan);
+            return (
+              <div className="plan-list-item" key={plan.id}>
+                <button
+                  type="button"
+                  className={plan.favorite ? "btn-icon fav-active" : "btn-icon"}
+                  onClick={() => handleToggleFavorite(plan)}
+                  aria-label={plan.favorite ? "Remove from favorites" : "Add to favorites"}
+                >
+                  {plan.favorite ? "★" : "☆"}
+                </button>
+                <button
+                  type="button"
+                  className="plan-list-main"
+                  onClick={() => navigate(`/plans/${plan.id}`)}
+                >
+                  <div className="drill-card-header">
+                    <span className="drill-card-name">{plan.name}</span>
+                    {plan.date && <span className="badge">{plan.date}</span>}
+                  </div>
+                  <div className="drill-card-meta">
+                    {window && <span>🕐 {window}</span>}
+                    <span>⏱ {totalMinutes} min total</span>
+                    <span>📋 {plan.segments.length} blocks · {drillCount(plan)} drills</span>
+                  </div>
+                </button>
+                <button type="button" className="btn btn-danger" onClick={() => handleDelete(plan)}>
+                  Delete
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
