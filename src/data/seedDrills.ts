@@ -1,0 +1,254 @@
+import type { DrillInput } from "../types";
+
+export const seedDrills: DrillInput[] = [
+  {
+    name: "Dynamic Stretch & Movement Circuit",
+    category: "Warm-up",
+    description:
+      "Players move through a series of dynamic stretches (high knees, butt kicks, carioca, lunges) across the court to raise heart rate and prepare joints for play.",
+    tags: ["dynamic stretching", "mobility", "pre-practice", "injury prevention"],
+    duration: 10,
+    participants: "Full team",
+    equipment: "None",
+  },
+  {
+    name: "Pepper Warm-up",
+    category: "Warm-up",
+    description:
+      "Partners pass, set, and hit a ball back and forth in a controlled pattern to warm up passing platforms, hands, and arm swings.",
+    tags: ["pepper", "partner drill", "ball control", "pre-practice"],
+    duration: 10,
+    participants: "Pairs",
+    equipment: "1 ball per pair",
+  },
+  {
+    name: "Target Serving",
+    category: "Serving",
+    description:
+      "Servers aim for cones or hoops placed in the deep corners, short zones, and seams of the opposing court, scoring points for hitting targets to build serve accuracy.",
+    tags: ["serve accuracy", "target practice", "float serve", "jump serve"],
+    duration: 15,
+    participants: "Individual, rotating queue",
+    equipment: "Cones or hoops, cart of balls",
+  },
+  {
+    name: "Serve & Move",
+    category: "Serving",
+    description:
+      "Players serve from behind the endline and immediately sprint to a designated defensive position, simulating the transition from serving to playing defense.",
+    tags: ["serve", "transition", "conditioning", "game-like"],
+    duration: 12,
+    participants: "Full team",
+    equipment: "Cart of balls",
+  },
+  {
+    name: "Serve Receive Progression",
+    category: "Passing & Receiving",
+    description:
+      "Coaches or tossers feed serves from behind the endline to passers stationed in a receive formation; passers try to deliver a quality pass to the target zone near the setter.",
+    tags: ["serve receive", "passing", "platform", "target zone"],
+    duration: 15,
+    participants: "6-8 players + tosser",
+    equipment: "Cart of balls, target cone",
+  },
+  {
+    name: "Wall Passing",
+    category: "Passing & Receiving",
+    description:
+      "Players pass a ball repeatedly against a wall, focusing on platform angle and consistent contact to build passing touch.",
+    tags: ["passing", "platform", "individual", "fundamentals"],
+    duration: 8,
+    participants: "Individual",
+    equipment: "Wall, 1 ball per player",
+  },
+  {
+    name: "Queen of the Court Passing",
+    category: "Passing & Receiving",
+    description:
+      "Three passers compete to make the cleanest passes off coach-initiated serves or hits; the best passer stays on the court while others rotate through, adding competitive pressure to receiving reps.",
+    tags: ["passing", "competitive", "serve receive", "pressure"],
+    duration: 15,
+    participants: "Groups of 3-4",
+    equipment: "Cart of balls",
+  },
+  {
+    name: "Setter Footwork Ladder",
+    category: "Setting",
+    description:
+      "Setters work through footwork patterns (shuffle, crossover, sprint) to the target area using an agility ladder, then finish each rep by setting a tossed ball.",
+    tags: ["setter", "footwork", "agility", "fundamentals"],
+    duration: 10,
+    participants: "Setters",
+    equipment: "Agility ladder, balls",
+  },
+  {
+    name: "Three-Person Setting Triangle",
+    category: "Setting",
+    description:
+      "Three players form a triangle and set the ball around continuously, emphasizing hand shape, footwork to the ball, and consistent set height and location.",
+    tags: ["setting", "hand shape", "partner drill", "fundamentals"],
+    duration: 10,
+    participants: "Groups of 3",
+    equipment: "1 ball per group",
+  },
+  {
+    name: "Setter Tempo Sets",
+    category: "Setting",
+    description:
+      "A tosser feeds balls to the setter from various positions on the court; the setter delivers quick sets (1s, 2s, back sets) to hitters at different tempos to develop touch and decision-making.",
+    tags: ["setter", "tempo", "quick set", "decision making"],
+    duration: 15,
+    participants: "Setter + 3-4 hitters",
+    equipment: "Cart of balls",
+  },
+  {
+    name: "Line & Cross-Court Hitting",
+    category: "Attacking",
+    description:
+      "Hitters take approach swings against a tossed or set ball, alternating between hitting down the line and cross-court to develop shot placement and shoulder control.",
+    tags: ["hitting", "attacking", "shot placement", "approach"],
+    duration: 15,
+    participants: "Hitters + setter/tosser",
+    equipment: "Cart of balls",
+  },
+  {
+    name: "Approach & Armswing Progression",
+    category: "Attacking",
+    description:
+      "Players break down the attack approach into steps (rhythm, plant, jump, armswing) starting slow and without a ball, then progress to full-speed approaches finishing with a hit off a toss.",
+    tags: ["hitting", "approach", "armswing", "fundamentals"],
+    duration: 12,
+    participants: "Hitters",
+    equipment: "Cart of balls",
+  },
+  {
+    name: "Hitting Off the Block",
+    category: "Attacking",
+    description:
+      "Hitters attack against a single or double block, practicing shots that go around, off, or through the block, including tools, wipes, and cut shots.",
+    tags: ["hitting", "blocking", "shot selection", "game-like"],
+    duration: 15,
+    participants: "Hitters + blockers + setter",
+    equipment: "Cart of balls",
+  },
+  {
+    name: "Block Footwork & Hand Position",
+    category: "Blocking",
+    description:
+      "Blockers practice lateral shuffle and crossover steps along the net, closing to a designated spot and finishing with a controlled jump and proper hand penetration over an imaginary net line.",
+    tags: ["blocking", "footwork", "fundamentals", "net play"],
+    duration: 10,
+    participants: "Front row players",
+    equipment: "Net",
+  },
+  {
+    name: "Read & React Blocking",
+    category: "Blocking",
+    description:
+      "A coach or setter sets to different hitters while blockers read the set location and hitter approach, practicing timing their jump to close the block.",
+    tags: ["blocking", "reading", "timing", "game-like"],
+    duration: 15,
+    participants: "Blockers + setter + hitters",
+    equipment: "Cart of balls, net",
+  },
+  {
+    name: "Dig & Transition to Attack",
+    category: "Defense & Digging",
+    description:
+      "Defenders dig a hard-driven ball hit or thrown by the coach, then the team transitions immediately into an attack, emphasizing quick recovery from defense to offense.",
+    tags: ["digging", "defense", "transition", "game-like"],
+    duration: 15,
+    participants: "6 players",
+    equipment: "Cart of balls",
+  },
+  {
+    name: "Sprawl & Roll Recovery",
+    category: "Defense & Digging",
+    description:
+      "Players practice diving, sprawling, and rolling techniques to recover balls hit just out of reach, focusing on safe landing mechanics and quick return to a ready position.",
+    tags: ["digging", "diving", "technique", "fundamentals"],
+    duration: 10,
+    participants: "Full team",
+    equipment: "Mats (optional)",
+  },
+  {
+    name: "Emergency Defense Circle",
+    category: "Defense & Digging",
+    description:
+      "Players stand in a circle and the coach hits or tosses balls unpredictably at each player, forcing quick emergency-style digs and reflex reactions.",
+    tags: ["digging", "reaction", "reflex", "fundamentals"],
+    duration: 8,
+    participants: "Group of 6-8",
+    equipment: "Cart of balls",
+  },
+  {
+    name: "Four-Corner Ball Control",
+    category: "Ball Control",
+    description:
+      "Players rotate through four stations at the corners of the court, passing, setting, and hitting a continuously moving ball to build all-around touch under mild fatigue.",
+    tags: ["ball control", "rotation", "fundamentals", "endurance"],
+    duration: 12,
+    participants: "8-12 players",
+    equipment: "2-3 balls",
+  },
+  {
+    name: "Partner Pepper",
+    category: "Ball Control",
+    description:
+      "Two players continuously hit, pass, and set a ball back and forth over a short distance, keeping the rally alive to build touch, communication, and control.",
+    tags: ["pepper", "ball control", "partner drill", "fundamentals"],
+    duration: 10,
+    participants: "Pairs",
+    equipment: "1 ball per pair",
+  },
+  {
+    name: "Suicide Sprints with Ball Touch",
+    category: "Conditioning",
+    description:
+      "Players sprint to progressively farther lines on the court, touching the floor at each line, then finish with a defensive shuffle and a controlled ball contact.",
+    tags: ["conditioning", "sprints", "endurance", "footwork"],
+    duration: 8,
+    participants: "Full team",
+    equipment: "1 ball",
+  },
+  {
+    name: "Court Sprints & Jump Series",
+    category: "Conditioning",
+    description:
+      "A circuit combining baseline-to-baseline sprints, lateral shuffles, and vertical jump repetitions to build the explosive power and stamina volleyball demands.",
+    tags: ["conditioning", "jumping", "power", "endurance"],
+    duration: 10,
+    participants: "Full team",
+    equipment: "None",
+  },
+  {
+    name: "6v6 Scrimmage",
+    category: "Team & Scrimmage",
+    description:
+      "Full live game play with regular rotations and scoring, allowing players to apply skills in a game-realistic context and giving coaches a chance to evaluate execution under pressure.",
+    tags: ["scrimmage", "game-like", "team", "live play"],
+    duration: 25,
+    participants: "12+ players",
+    equipment: "Net, cart of balls, scoreboard",
+  },
+  {
+    name: "Situational Scoring Games",
+    category: "Team & Scrimmage",
+    description:
+      "The coach sets up specific game situations (e.g., team down 2 points, serve receive only) and play resumes from that score, forcing players to execute under simulated match pressure.",
+    tags: ["scrimmage", "game-like", "pressure", "situational"],
+    duration: 20,
+    participants: "12+ players",
+    equipment: "Net, cart of balls",
+  },
+  {
+    name: "King/Queen of the Court",
+    category: "Team & Scrimmage",
+    description:
+      "Small teams (2v2 or 3v3) play short rally-scored games on split courts; winning teams advance to the top court, creating competitive, high-intensity mini-games.",
+    tags: ["scrimmage", "competitive", "small-sided", "game-like"],
+    duration: 20,
+    participants: "12+ players",
+    equipment: "Multiple nets/courts, balls",
+  },
+];
