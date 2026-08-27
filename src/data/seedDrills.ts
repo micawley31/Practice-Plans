@@ -4,6 +4,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Dynamic Stretch & Movement Circuit",
     category: "Warm-up",
+    difficulty: "Beginner",
     description:
       "Players move through a series of dynamic stretches (high knees, butt kicks, carioca, lunges) across the court to raise heart rate and prepare joints for play.",
     tags: ["dynamic stretching", "mobility", "pre-practice", "injury prevention"],
@@ -14,6 +15,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Pepper Warm-up",
     category: "Warm-up",
+    difficulty: "Beginner",
     description:
       "Partners pass, set, and hit a ball back and forth in a controlled pattern to warm up passing platforms, hands, and arm swings.",
     tags: ["pepper", "partner drill", "ball control", "pre-practice"],
@@ -24,6 +26,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Target Serving",
     category: "Serving",
+    difficulty: "Intermediate",
     description:
       "Servers aim for cones or hoops placed in the deep corners, short zones, and seams of the opposing court, scoring points for hitting targets to build serve accuracy.",
     tags: ["serve accuracy", "target practice", "float serve", "jump serve"],
@@ -34,6 +37,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Serve & Move",
     category: "Serving",
+    difficulty: "Intermediate",
     description:
       "Players serve from behind the endline and immediately sprint to a designated defensive position, simulating the transition from serving to playing defense.",
     tags: ["serve", "transition", "conditioning", "game-like"],
@@ -44,6 +48,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Serve Receive Progression",
     category: "Passing & Receiving",
+    difficulty: "Intermediate",
     description:
       "Coaches or tossers feed serves from behind the endline to passers stationed in a receive formation; passers try to deliver a quality pass to the target zone near the setter.",
     tags: ["serve receive", "passing", "platform", "target zone"],
@@ -54,6 +59,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Wall Passing",
     category: "Passing & Receiving",
+    difficulty: "Beginner",
     description:
       "Players pass a ball repeatedly against a wall, focusing on platform angle and consistent contact to build passing touch.",
     tags: ["passing", "platform", "individual", "fundamentals"],
@@ -64,6 +70,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Queen of the Court Passing",
     category: "Passing & Receiving",
+    difficulty: "Intermediate",
     description:
       "Three passers compete to make the cleanest passes off coach-initiated serves or hits; the best passer stays on the court while others rotate through, adding competitive pressure to receiving reps.",
     tags: ["passing", "competitive", "serve receive", "pressure"],
@@ -74,6 +81,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Setter Footwork Ladder",
     category: "Setting",
+    difficulty: "Intermediate",
     description:
       "Setters work through footwork patterns (shuffle, crossover, sprint) to the target area using an agility ladder, then finish each rep by setting a tossed ball.",
     tags: ["setter", "footwork", "agility", "fundamentals"],
@@ -84,6 +92,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Three-Person Setting Triangle",
     category: "Setting",
+    difficulty: "Beginner",
     description:
       "Three players form a triangle and set the ball around continuously, emphasizing hand shape, footwork to the ball, and consistent set height and location.",
     tags: ["setting", "hand shape", "partner drill", "fundamentals"],
@@ -94,6 +103,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Setter Tempo Sets",
     category: "Setting",
+    difficulty: "Advanced",
     description:
       "A tosser feeds balls to the setter from various positions on the court; the setter delivers quick sets (1s, 2s, back sets) to hitters at different tempos to develop touch and decision-making.",
     tags: ["setter", "tempo", "quick set", "decision making"],
@@ -104,6 +114,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Line & Cross-Court Hitting",
     category: "Attacking",
+    difficulty: "Intermediate",
     description:
       "Hitters take approach swings against a tossed or set ball, alternating between hitting down the line and cross-court to develop shot placement and shoulder control.",
     tags: ["hitting", "attacking", "shot placement", "approach"],
@@ -114,6 +125,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Approach & Armswing Progression",
     category: "Attacking",
+    difficulty: "Beginner",
     description:
       "Players break down the attack approach into steps (rhythm, plant, jump, armswing) starting slow and without a ball, then progress to full-speed approaches finishing with a hit off a toss.",
     tags: ["hitting", "approach", "armswing", "fundamentals"],
@@ -124,6 +136,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Hitting Off the Block",
     category: "Attacking",
+    difficulty: "Advanced",
     description:
       "Hitters attack against a single or double block, practicing shots that go around, off, or through the block, including tools, wipes, and cut shots.",
     tags: ["hitting", "blocking", "shot selection", "game-like"],
@@ -134,6 +147,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Block Footwork & Hand Position",
     category: "Blocking",
+    difficulty: "Beginner",
     description:
       "Blockers practice lateral shuffle and crossover steps along the net, closing to a designated spot and finishing with a controlled jump and proper hand penetration over an imaginary net line.",
     tags: ["blocking", "footwork", "fundamentals", "net play"],
@@ -144,6 +158,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Read & React Blocking",
     category: "Blocking",
+    difficulty: "Advanced",
     description:
       "A coach or setter sets to different hitters while blockers read the set location and hitter approach, practicing timing their jump to close the block.",
     tags: ["blocking", "reading", "timing", "game-like"],
@@ -154,6 +169,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Dig & Transition to Attack",
     category: "Defense & Digging",
+    difficulty: "Advanced",
     description:
       "Defenders dig a hard-driven ball hit or thrown by the coach, then the team transitions immediately into an attack, emphasizing quick recovery from defense to offense.",
     tags: ["digging", "defense", "transition", "game-like"],
@@ -164,6 +180,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Sprawl & Roll Recovery",
     category: "Defense & Digging",
+    difficulty: "Intermediate",
     description:
       "Players practice diving, sprawling, and rolling techniques to recover balls hit just out of reach, focusing on safe landing mechanics and quick return to a ready position.",
     tags: ["digging", "diving", "technique", "fundamentals"],
@@ -174,6 +191,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Emergency Defense Circle",
     category: "Defense & Digging",
+    difficulty: "Intermediate",
     description:
       "Players stand in a circle and the coach hits or tosses balls unpredictably at each player, forcing quick emergency-style digs and reflex reactions.",
     tags: ["digging", "reaction", "reflex", "fundamentals"],
@@ -184,6 +202,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Four-Corner Ball Control",
     category: "Ball Control",
+    difficulty: "Beginner",
     description:
       "Players rotate through four stations at the corners of the court, passing, setting, and hitting a continuously moving ball to build all-around touch under mild fatigue.",
     tags: ["ball control", "rotation", "fundamentals", "endurance"],
@@ -194,6 +213,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Partner Pepper",
     category: "Ball Control",
+    difficulty: "Beginner",
     description:
       "Two players continuously hit, pass, and set a ball back and forth over a short distance, keeping the rally alive to build touch, communication, and control.",
     tags: ["pepper", "ball control", "partner drill", "fundamentals"],
@@ -204,6 +224,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Suicide Sprints with Ball Touch",
     category: "Conditioning",
+    difficulty: "Beginner",
     description:
       "Players sprint to progressively farther lines on the court, touching the floor at each line, then finish with a defensive shuffle and a controlled ball contact.",
     tags: ["conditioning", "sprints", "endurance", "footwork"],
@@ -214,6 +235,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Court Sprints & Jump Series",
     category: "Conditioning",
+    difficulty: "Intermediate",
     description:
       "A circuit combining baseline-to-baseline sprints, lateral shuffles, and vertical jump repetitions to build the explosive power and stamina volleyball demands.",
     tags: ["conditioning", "jumping", "power", "endurance"],
@@ -224,6 +246,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "6v6 Scrimmage",
     category: "Team & Scrimmage",
+    difficulty: "Intermediate",
     description:
       "Full live game play with regular rotations and scoring, allowing players to apply skills in a game-realistic context and giving coaches a chance to evaluate execution under pressure.",
     tags: ["scrimmage", "game-like", "team", "live play"],
@@ -234,6 +257,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "Situational Scoring Games",
     category: "Team & Scrimmage",
+    difficulty: "Advanced",
     description:
       "The coach sets up specific game situations (e.g., team down 2 points, serve receive only) and play resumes from that score, forcing players to execute under simulated match pressure.",
     tags: ["scrimmage", "game-like", "pressure", "situational"],
@@ -244,6 +268,7 @@ export const seedDrills: DrillInput[] = [
   {
     name: "King/Queen of the Court",
     category: "Team & Scrimmage",
+    difficulty: "Intermediate",
     description:
       "Small teams (2v2 or 3v3) play short rally-scored games on split courts; winning teams advance to the top court, creating competitive, high-intensity mini-games.",
     tags: ["scrimmage", "competitive", "small-sided", "game-like"],

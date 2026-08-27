@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { DRILL_CATEGORIES, type Drill, type DrillInput } from "../types";
+import { DIFFICULTY_LEVELS, DRILL_CATEGORIES, type Drill, type DrillInput } from "../types";
 import { Modal } from "./Modal";
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
 export function DrillFormModal({ initial, onSave, onClose }: Props) {
   const [name, setName] = useState(initial?.name ?? "");
   const [category, setCategory] = useState(initial?.category ?? DRILL_CATEGORIES[0]);
+  const [difficulty, setDifficulty] = useState(initial?.difficulty ?? DIFFICULTY_LEVELS[0]);
   const [description, setDescription] = useState(initial?.description ?? "");
   const [tags, setTags] = useState(initial?.tags.join(", ") ?? "");
   const [duration, setDuration] = useState(initial?.duration ?? 10);
@@ -31,6 +32,7 @@ export function DrillFormModal({ initial, onSave, onClose }: Props) {
     onSave({
       name: name.trim(),
       category,
+      difficulty,
       description: description.trim(),
       tags: tags
         .split(",")
@@ -50,19 +52,34 @@ export function DrillFormModal({ initial, onSave, onClose }: Props) {
           <span>Name</span>
           <input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
         </label>
-        <label className="field">
-          <span>Category</span>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value as typeof category)}
-          >
-            {DRILL_CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="field-row">
+          <label className="field">
+            <span>Category</span>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as typeof category)}
+            >
+              {DRILL_CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span>Difficulty</span>
+            <select
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value as typeof difficulty)}
+            >
+              {DIFFICULTY_LEVELS.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
         <label className="field">
           <span>Description</span>
           <textarea

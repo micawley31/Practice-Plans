@@ -1,36 +1,30 @@
 import { useMemo, useState } from "react";
-import { CategoryFilter } from "../components/CategoryFilter";
 import { DrillCard } from "../components/DrillCard";
 import { DrillDetailModal } from "../components/DrillDetailModal";
+import { DrillFilterBar } from "../components/DrillFilterBar";
 import { DrillFormModal } from "../components/DrillFormModal";
 import * as db from "../storage/db";
-import type { Drill, DrillCategory, DrillInput } from "../types";
+import type { Drill, DrillCategory, DrillDifficulty, DrillInput } from "../types";
 import { filterDrills } from "../utils/filterDrills";
+import { toggleInSet } from "../utils/toggleSet";
 
 export function Library() {
   const [drills, setDrills] = useState<Drill[]>(() => db.getDrills());
   const [query, setQuery] = useState("");
   const [categories, setCategories] = useState<Set<DrillCategory>>(new Set());
+  const [difficulties, setDifficulties] = useState<Set<DrillDifficulty>>(new Set());
+  const [minRating, setMinRating] = useState(0);
   const [detailDrill, setDetailDrill] = useState<Drill | null>(null);
   const [formDrill, setFormDrill] = useState<Drill | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   const filtered = useMemo(
-    () => filterDrills(drills, query, categories),
-    [drills, query, categories]
+    () => filterDrills(drills, query, categories, difficulties, minRating),
+    [drills, query, categories, difficulties, minRating]
   );
 
   function refresh() {
     setDrills(db.getDrills());
-  }
-
-  function toggleCategory(category: DrillCategory) {
-    setCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(category)) next.delete(category);
-      else next.add(category);
-      return next;
-    });
   }
 
   function handleSave(input: DrillInput) {
@@ -54,6 +48,28 @@ export function Library() {
     setDetailDrill(null);
   }
 
+  function handleRate(score: number) {
+    if (!detailDrill) return;
+    const updated = db.rateDrill(detailDrill.id, score);
+    refresh();
+    if (updated) setDetailDrill(updated);
+  }
+
+  function handleAddComment(text: string, author?: string) {
+    if (!detailDrill) return;
+    const updated = db.addComment(detailDrill.id, text, author);
+    refresh();
+    if (updated) setDetailDrill(updated);
+  }
+
+  function handleDeleteComment(commentId: string) {
+    if (!detailDrill) return;
+    if (!confirm("Delete this comment?")) return;
+    const updated = db.deleteComment(detailDrill.id, commentId);
+    refresh();
+    if (updated) setDetailDrill(updated);
+  }
+
   return (
     <div className="page">
       <div className="page-header">
@@ -75,22 +91,21 @@ export function Library() {
         </button>
       </div>
 
-      <input
-        className="search-input"
-        type="search"
-        placeholder="Search by name, description, or keyword…"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
-
-      <CategoryFilter
-        selected={categories}
-        onToggle={toggleCategory}
-        onClear={() => setCategories(new Set())}
+      <DrillFilterBar
+        query={query}
+        onQueryChange={setQuery}
+        categories={categories}
+        onToggleCategory={(c) => setCategories((prev) => toggleInSet(prev, c))}
+        onClearCategories={() => setCategories(new Set())}
+        difficulties={difficulties}
+        onToggleDifficulty={(d) => setDifficulties((prev) => toggleInSet(prev, d))}
+        onClearDifficulties={() => setDifficulties(new Set())}
+        minRating={minRating}
+        onMinRatingChange={setMinRating}
       />
 
       {filtered.length === 0 ? (
-        <p className="empty-state">No drills match your search. Try a different keyword or category.</p>
+        <p className="empty-state">No drills match your search. Try a different keyword or filter.</p>
       ) : (
         <div className="drill-grid">
           {filtered.map((drill) => (
@@ -108,6 +123,9 @@ export function Library() {
             setShowForm(true);
           }}
           onDelete={() => handleDelete(detailDrill)}
+          onRate={handleRate}
+          onAddComment={handleAddComment}
+          onDeleteComment={handleDeleteComment}
         />
       )}
 

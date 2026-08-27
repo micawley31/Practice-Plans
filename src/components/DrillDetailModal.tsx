@@ -1,19 +1,44 @@
+import * as db from "../storage/db";
 import type { Drill } from "../types";
+import { getAverageRating, getMyRating } from "../utils/rating";
+import { DrillComments } from "./DrillComments";
 import { Modal } from "./Modal";
+import { StarRating } from "./StarRating";
 
 interface Props {
   drill: Drill;
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onRate: (score: number) => void;
+  onAddComment: (text: string, author?: string) => void;
+  onDeleteComment: (commentId: string) => void;
   action?: { label: string; onClick: (drill: Drill) => void };
 }
 
-export function DrillDetailModal({ drill, onClose, onEdit, onDelete, action }: Props) {
+export function DrillDetailModal({
+  drill,
+  onClose,
+  onEdit,
+  onDelete,
+  onRate,
+  onAddComment,
+  onDeleteComment,
+  action,
+}: Props) {
+  const { average, count } = getAverageRating(drill);
+  const myRating = getMyRating(drill, db.getRaterId());
+
   return (
     <Modal title={drill.name} onClose={onClose}>
       <div className="drill-detail">
-        <span className="badge">{drill.category}</span>
+        <div className="badge-group">
+          <span className="badge">{drill.category}</span>
+          <span className={`badge badge-difficulty badge-${drill.difficulty.toLowerCase()}`}>
+            {drill.difficulty}
+          </span>
+        </div>
+        <StarRating average={average} count={count} myRating={myRating} onRate={onRate} />
         <p className="drill-detail-description">{drill.description}</p>
         <dl className="drill-detail-meta">
           <div>
@@ -59,6 +84,12 @@ export function DrillDetailModal({ drill, onClose, onEdit, onDelete, action }: P
             </button>
           )}
         </div>
+        <hr className="divider" />
+        <DrillComments
+          comments={drill.comments}
+          onAdd={onAddComment}
+          onDelete={onDeleteComment}
+        />
       </div>
     </Modal>
   );

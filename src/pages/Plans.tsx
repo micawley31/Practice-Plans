@@ -17,6 +17,11 @@ export function Plans() {
     setPlans(db.getPlans());
   }
 
+  function handleToggleFavorite(plan: PracticePlan) {
+    db.toggleFavoritePlan(plan.id);
+    setPlans(db.getPlans());
+  }
+
   return (
     <div className="page">
       <div className="page-header">
@@ -37,6 +42,14 @@ export function Plans() {
         <div className="plan-list">
           {plans.map((plan) => (
             <div className="plan-list-item" key={plan.id}>
+              <button
+                type="button"
+                className={plan.favorite ? "btn-icon fav-active" : "btn-icon"}
+                onClick={() => handleToggleFavorite(plan)}
+                aria-label={plan.favorite ? "Remove from favorites" : "Add to favorites"}
+              >
+                {plan.favorite ? "★" : "☆"}
+              </button>
               <button
                 type="button"
                 className="plan-list-main"

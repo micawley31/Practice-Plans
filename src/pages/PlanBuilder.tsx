@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { CategoryFilter } from "../components/CategoryFilter";
 import { DrillCard } from "../components/DrillCard";
+import { DrillFilterBar } from "../components/DrillFilterBar";
 import * as db from "../storage/db";
-import type { Drill, DrillCategory, PlanDrill } from "../types";
+import type { Drill, DrillCategory, DrillDifficulty, PlanDrill } from "../types";
 import { filterDrills } from "../utils/filterDrills";
+import { toggleInSet } from "../utils/toggleSet";
 
 export function PlanBuilder() {
   const { id } = useParams();
@@ -22,15 +23,18 @@ export function PlanBuilder() {
   const [name, setName] = useState(existing?.name ?? "");
   const [date, setDate] = useState(existing?.date ?? "");
   const [notes, setNotes] = useState(existing?.notes ?? "");
+  const [favorite, setFavorite] = useState(existing?.favorite ?? false);
   const [planDrills, setPlanDrills] = useState<PlanDrill[]>(existing?.drills ?? []);
   const [error, setError] = useState("");
 
   const [query, setQuery] = useState("");
   const [categories, setCategories] = useState<Set<DrillCategory>>(new Set());
+  const [difficulties, setDifficulties] = useState<Set<DrillDifficulty>>(new Set());
+  const [minRating, setMinRating] = useState(0);
 
   const filtered = useMemo(
-    () => filterDrills(allDrills, query, categories),
-    [allDrills, query, categories]
+    () => filterDrills(allDrills, query, categories, difficulties, minRating),
+    [allDrills, query, categories, difficulties, minRating]
   );
 
   const totalMinutes = planDrills.reduce((sum, d) => sum + d.duration, 0);
@@ -94,6 +98,7 @@ export function PlanBuilder() {
       date: date || undefined,
       notes: notes.trim() || undefined,
       drills: planDrills,
+      favorite,
     };
     if (existing) {
       db.updatePlan(existing.id, input);
@@ -108,9 +113,18 @@ export function PlanBuilder() {
     <div className="page">
       <div className="page-header">
         <h1>{existing ? "Edit Practice Plan" : "New Practice Plan"}</h1>
-        <button type="button" className="btn" onClick={() => navigate("/plans")}>
-          Back to plans
-        </button>
+        <div className="page-header-actions">
+          <button
+            type="button"
+            className={favorite ? "btn fav-active" : "btn"}
+            onClick={() => setFavorite((f) => !f)}
+          >
+            {favorite ? "★ Favorited" : "☆ Favorite"}
+          </button>
+          <button type="button" className="btn" onClick={() => navigate("/plans")}>
+            Back to plans
+          </button>
+        </div>
       </div>
 
       <div className="plan-meta form">
@@ -174,7 +188,16 @@ export function PlanBuilder() {
                         <span className="drill-card-name">
                           {drill ? drill.name : "(drill removed from library)"}
                         </span>
-                        {drill && <span className="badge">{drill.category}</span>}
+                        {drill && (
+                          <div className="badge-group">
+                            <span className="badge">{drill.category}</span>
+                            <span
+                              className={`badge badge-difficulty badge-${drill.difficulty.toLowerCase()}`}
+                            >
+                              {drill.difficulty}
+                            </span>
+                          </div>
+                        )}
                       </div>
                       {drill && <p className="drill-card-description">{drill.description}</p>}
                       <div className="field-row">
@@ -220,24 +243,17 @@ export function PlanBuilder() {
 
         <section className="plan-builder-column">
           <h2>Add drills from library</h2>
-          <input
-            className="search-input"
-            type="search"
-            placeholder="Search by name, description, or keyword…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <CategoryFilter
-            selected={categories}
-            onToggle={(c) =>
-              setCategories((prev) => {
-                const next = new Set(prev);
-                if (next.has(c)) next.delete(c);
-                else next.add(c);
-                return next;
-              })
-            }
-            onClear={() => setCategories(new Set())}
+          <DrillFilterBar
+            query={query}
+            onQueryChange={setQuery}
+            categories={categories}
+            onToggleCategory={(c) => setCategories((prev) => toggleInSet(prev, c))}
+            onClearCategories={() => setCategories(new Set())}
+            difficulties={difficulties}
+            onToggleDifficulty={(d) => setDifficulties((prev) => toggleInSet(prev, d))}
+            onClearDifficulties={() => setDifficulties(new Set())}
+            minRating={minRating}
+            onMinRatingChange={setMinRating}
           />
           <div className="drill-grid">
             {filtered.map((drill) => (
