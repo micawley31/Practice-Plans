@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { StarIcon } from "./icons";
 
 interface Props {
   average: number;
@@ -21,19 +22,24 @@ export function StarRating({ average, count, myRating, onRate, size = "md" }: Pr
         role={interactive ? "radiogroup" : undefined}
         aria-label={interactive ? "Rate this drill" : undefined}
       >
-        {[1, 2, 3, 4, 5].map((n) => (
-          <button
-            type="button"
-            key={n}
-            className={n <= displayValue ? "star star-filled" : "star"}
-            disabled={!interactive}
-            onMouseEnter={() => interactive && setHover(n)}
-            onClick={() => interactive && onRate?.(n)}
-            aria-label={`${n} star${n > 1 ? "s" : ""}`}
-          >
-            ★
-          </button>
-        ))}
+        {[1, 2, 3, 4, 5].map((n) =>
+          interactive ? (
+            <button
+              type="button"
+              key={n}
+              className={n <= displayValue ? "star star-filled" : "star"}
+              onMouseEnter={() => setHover(n)}
+              onClick={() => onRate?.(n)}
+              aria-label={`${n} star${n > 1 ? "s" : ""}`}
+            >
+              <StarIcon />
+            </button>
+          ) : (
+            <span key={n} className={n <= displayValue ? "star star-filled" : "star"}>
+              <StarIcon />
+            </span>
+          )
+        )}
       </div>
       <span className="star-rating-summary">
         {count > 0 ? `${average.toFixed(1)} (${count})` : "No ratings yet"}

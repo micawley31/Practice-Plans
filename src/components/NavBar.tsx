@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { ProfileSwitcher } from "./ProfileSwitcher";
+import { AccountMenu } from "./AccountMenu";
 
 export function NavBar() {
   return (
@@ -20,7 +20,7 @@ export function NavBar() {
             Practice Plans
           </NavLink>
         </nav>
-        <ProfileSwitcher />
+        <AccountMenu />
       </div>
     </header>
   );

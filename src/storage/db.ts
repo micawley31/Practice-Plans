@@ -1,264 +1,289 @@
-import { seedDrills } from "../data/seedDrills";
+import { supabase } from "../lib/supabaseClient";
 import type {
   Drill,
   DrillComment,
   DrillInput,
+  PlanSegment,
   PracticePlan,
   PracticePlanInput,
-  Profile,
 } from "../types";
-
-const DRILLS_KEY = "practice-plans:drills";
-const PLANS_KEY = "practice-plans:plans";
-const PROFILES_KEY = "practice-plans:profiles";
-const ACTIVE_PROFILE_KEY = "practice-plans:activeProfileId";
 
 export function makeId(): string {
   return crypto.randomUUID();
 }
 
-function readJson<T>(key: string, fallback: T): T {
-  const raw = localStorage.getItem(key);
-  if (!raw) return fallback;
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
+async function requireUserId(): Promise<string> {
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) throw new Error("Not signed in");
+  return data.user.id;
+}
+
+function toEpochMs(iso: string): number {
+  return new Date(iso).getTime();
+}
+
+function toIso(ms: number): string {
+  return new Date(ms).toISOString();
+}
+
+// Segments saved with bad/missing `kind` (shouldn't happen via the app, but
+// nothing at the DB layer enforces the shape) fall back to an empty drill
+// segment rather than crashing the UI's switch(segment.kind).
+function normalizeSegment(raw: any): PlanSegment {
+  if (raw?.kind === "break") {
+    return {
+      segmentId: raw.segmentId,
+      kind: "break",
+      label: raw.label ?? "Break",
+      duration: raw.duration ?? 5,
+    };
   }
-}
-
-function writeJson<T>(key: string, value: T): void {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-
-// Backfills fields added after a user's data was first created, so older
-// localStorage payloads keep working without a migration step.
-function normalizeDrill(d: Drill): Drill {
   return {
-    ...d,
-    difficulty: d.difficulty ?? "Beginner",
-    ratings: d.ratings ?? {},
-    comments: d.comments ?? [],
+    segmentId: raw?.segmentId ?? makeId(),
+    kind: "drill",
+    tracks: raw?.tracks ?? [],
   };
 }
 
-// Plans saved before branching support used a flat `drills` list instead of
-// `segments`; migrate each old entry into its own single-track segment.
-interface LegacyPlanDrill {
-  planDrillId: string;
-  drillId: string;
+interface DrillRow {
+  id: string;
+  name: string;
+  category: string;
+  difficulty: string;
+  description: string;
+  tags: string[];
   duration: number;
-  notes?: string;
+  participants: string | null;
+  equipment: string | null;
+  video_url: string | null;
+  diagram: unknown;
+  created_at: string;
+  updated_at: string;
+  drill_ratings: { user_id: string; score: number }[] | null;
+  drill_comments:
+    | {
+        id: string;
+        text: string;
+        created_at: string;
+        profiles: { display_name: string } | null;
+      }[]
+    | null;
 }
 
-function normalizePlan(raw: PracticePlan & { drills?: LegacyPlanDrill[] }): PracticePlan {
-  const segments =
-    raw.segments ??
-    (raw.drills ?? []).map((d) => ({
-      segmentId: d.planDrillId,
-      tracks: [
-        {
-          trackId: d.planDrillId,
-          label: "Court 1",
-          drillId: d.drillId,
-          duration: d.duration,
-          notes: d.notes,
-        },
-      ],
-    }));
-  return { ...raw, segments, favorite: raw.favorite ?? false };
+const DRILL_SELECT =
+  "*, drill_ratings(user_id, score), drill_comments(id, text, created_at, profiles(display_name))";
+
+function fromDrillRow(row: DrillRow): Drill {
+  const ratings: Record<string, number> = {};
+  (row.drill_ratings ?? []).forEach((r) => {
+    ratings[r.user_id] = r.score;
+  });
+  const comments: DrillComment[] = (row.drill_comments ?? [])
+    .map((c) => ({
+      id: c.id,
+      text: c.text,
+      author: c.profiles?.display_name,
+      createdAt: toEpochMs(c.created_at),
+    }))
+    .sort((a, b) => b.createdAt - a.createdAt);
+
+  return {
+    id: row.id,
+    name: row.name,
+    category: row.category as Drill["category"],
+    difficulty: row.difficulty as Drill["difficulty"],
+    description: row.description,
+    tags: row.tags ?? [],
+    duration: row.duration,
+    participants: row.participants ?? undefined,
+    equipment: row.equipment ?? undefined,
+    videoUrl: row.video_url ?? undefined,
+    diagram: (row.diagram as Drill["diagram"]) ?? undefined,
+    ratings,
+    comments,
+    createdAt: toEpochMs(row.created_at),
+    updatedAt: toEpochMs(row.updated_at),
+  };
 }
 
-function ensureSeeded(): void {
-  if (localStorage.getItem(DRILLS_KEY)) return;
-  const now = Date.now();
-  const drills: Drill[] = seedDrills.map((d) => ({
-    ...d,
-    id: makeId(),
-    ratings: {},
-    comments: [],
-    createdAt: now,
-    updatedAt: now,
-  }));
-  writeJson(DRILLS_KEY, drills);
+function toDrillColumns(input: DrillInput) {
+  return {
+    name: input.name,
+    category: input.category,
+    difficulty: input.difficulty,
+    description: input.description,
+    tags: input.tags,
+    duration: input.duration,
+    participants: input.participants ?? null,
+    equipment: input.equipment ?? null,
+    video_url: input.videoUrl ?? null,
+    diagram: input.diagram ?? null,
+  };
 }
 
-export function getDrills(): Drill[] {
-  ensureSeeded();
-  return readJson<Drill[]>(DRILLS_KEY, [])
-    .map(normalizeDrill)
+export async function getDrills(): Promise<Drill[]> {
+  const { data, error } = await supabase.from("drills").select(DRILL_SELECT);
+  if (error) throw error;
+  return (data as unknown as DrillRow[])
+    .map(fromDrillRow)
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export function getDrill(id: string): Drill | undefined {
-  return getDrills().find((d) => d.id === id);
+export async function getDrill(id: string): Promise<Drill | undefined> {
+  const { data, error } = await supabase.from("drills").select(DRILL_SELECT).eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data ? fromDrillRow(data as unknown as DrillRow) : undefined;
 }
 
-export function addDrill(input: DrillInput): Drill {
-  const now = Date.now();
-  const drill: Drill = {
-    ...input,
-    id: makeId(),
-    ratings: {},
-    comments: [],
-    createdAt: now,
-    updatedAt: now,
+export async function addDrill(input: DrillInput): Promise<Drill> {
+  const userId = await requireUserId();
+  const { data, error } = await supabase
+    .from("drills")
+    .insert({ id: makeId(), ...toDrillColumns(input), created_by: userId })
+    .select(DRILL_SELECT)
+    .single();
+  if (error) throw error;
+  return fromDrillRow(data as unknown as DrillRow);
+}
+
+export async function updateDrill(id: string, input: DrillInput): Promise<Drill | undefined> {
+  const { data, error } = await supabase
+    .from("drills")
+    .update({ ...toDrillColumns(input), updated_at: toIso(Date.now()) })
+    .eq("id", id)
+    .select(DRILL_SELECT)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? fromDrillRow(data as unknown as DrillRow) : undefined;
+}
+
+export async function deleteDrill(id: string): Promise<void> {
+  const { error } = await supabase.from("drills").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function rateDrill(id: string, score: number): Promise<Drill | undefined> {
+  const userId = await requireUserId();
+  const { error } = await supabase
+    .from("drill_ratings")
+    .upsert({ drill_id: id, user_id: userId, score }, { onConflict: "drill_id,user_id" });
+  if (error) throw error;
+  return getDrill(id);
+}
+
+export async function addComment(drillId: string, text: string): Promise<Drill | undefined> {
+  const userId = await requireUserId();
+  const { error } = await supabase
+    .from("drill_comments")
+    .insert({ drill_id: drillId, user_id: userId, text });
+  if (error) throw error;
+  return getDrill(drillId);
+}
+
+export async function deleteComment(drillId: string, commentId: string): Promise<Drill | undefined> {
+  const { error } = await supabase.from("drill_comments").delete().eq("id", commentId);
+  if (error) throw error;
+  return getDrill(drillId);
+}
+
+interface PlanRow {
+  id: string;
+  name: string;
+  date: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  notes: string | null;
+  segments: unknown;
+  favorite: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+function fromPlanRow(row: PlanRow): PracticePlan {
+  const rawSegments = Array.isArray(row.segments) ? row.segments : [];
+  return {
+    id: row.id,
+    name: row.name,
+    date: row.date ?? undefined,
+    startTime: row.start_time ?? undefined,
+    endTime: row.end_time ?? undefined,
+    notes: row.notes ?? undefined,
+    segments: rawSegments.map(normalizeSegment),
+    favorite: row.favorite,
+    createdAt: toEpochMs(row.created_at),
+    updatedAt: toEpochMs(row.updated_at),
   };
-  const drills = getDrills();
-  drills.push(drill);
-  writeJson(DRILLS_KEY, drills);
-  return drill;
 }
 
-export function updateDrill(id: string, input: DrillInput): Drill | undefined {
-  const drills = getDrills();
-  const idx = drills.findIndex((d) => d.id === id);
-  if (idx === -1) return undefined;
-  const updated: Drill = { ...drills[idx], ...input, updatedAt: Date.now() };
-  drills[idx] = updated;
-  writeJson(DRILLS_KEY, drills);
-  return updated;
-}
-
-export function deleteDrill(id: string): void {
-  const drills = getDrills().filter((d) => d.id !== id);
-  writeJson(DRILLS_KEY, drills);
-
-  const plans = getPlans().map((p) => ({
-    ...p,
-    segments: p.segments
-      .map((seg) => ({ ...seg, tracks: seg.tracks.filter((t) => t.drillId !== id) }))
-      .filter((seg) => seg.tracks.length > 0),
-  }));
-  writeJson(PLANS_KEY, plans);
-}
-
-// No backend/auth yet: "accounts" are local profiles a person names
-// themselves, switchable from the navbar and stashed in localStorage.
-// Ratings key off the active profile's id; comments snapshot its name.
-function ensureProfile(): void {
-  if (localStorage.getItem(PROFILES_KEY)) return;
-  const profile: Profile = { id: makeId(), name: "Coach 1", createdAt: Date.now() };
-  writeJson(PROFILES_KEY, [profile]);
-  localStorage.setItem(ACTIVE_PROFILE_KEY, profile.id);
-}
-
-export function getProfiles(): Profile[] {
-  ensureProfile();
-  return readJson<Profile[]>(PROFILES_KEY, []);
-}
-
-export function getActiveProfile(): Profile {
-  const profiles = getProfiles();
-  const activeId = localStorage.getItem(ACTIVE_PROFILE_KEY);
-  return profiles.find((p) => p.id === activeId) ?? profiles[0];
-}
-
-export function setActiveProfile(id: string): void {
-  localStorage.setItem(ACTIVE_PROFILE_KEY, id);
-}
-
-export function createProfile(name: string): Profile {
-  const profile: Profile = { id: makeId(), name, createdAt: Date.now() };
-  const profiles = getProfiles();
-  profiles.push(profile);
-  writeJson(PROFILES_KEY, profiles);
-  setActiveProfile(profile.id);
-  return profile;
-}
-
-export function renameProfile(id: string, name: string): void {
-  const profiles = getProfiles().map((p) => (p.id === id ? { ...p, name } : p));
-  writeJson(PROFILES_KEY, profiles);
-}
-
-export function rateDrill(id: string, score: number): Drill | undefined {
-  const drills = getDrills();
-  const idx = drills.findIndex((d) => d.id === id);
-  if (idx === -1) return undefined;
-  const updated: Drill = {
-    ...drills[idx],
-    ratings: { ...drills[idx].ratings, [getActiveProfile().id]: score },
-    updatedAt: Date.now(),
+function toPlanColumns(input: PracticePlanInput) {
+  return {
+    name: input.name,
+    date: input.date ?? null,
+    start_time: input.startTime ?? null,
+    end_time: input.endTime ?? null,
+    notes: input.notes ?? null,
+    segments: input.segments,
+    favorite: input.favorite,
   };
-  drills[idx] = updated;
-  writeJson(DRILLS_KEY, drills);
-  return updated;
 }
 
-export function addComment(drillId: string, text: string): Drill | undefined {
-  const drills = getDrills();
-  const idx = drills.findIndex((d) => d.id === drillId);
-  if (idx === -1) return undefined;
-  const comment: DrillComment = {
-    id: makeId(),
-    text,
-    author: getActiveProfile().name,
-    createdAt: Date.now(),
-  };
-  const updated: Drill = { ...drills[idx], comments: [...drills[idx].comments, comment] };
-  drills[idx] = updated;
-  writeJson(DRILLS_KEY, drills);
-  return updated;
-}
-
-export function deleteComment(drillId: string, commentId: string): Drill | undefined {
-  const drills = getDrills();
-  const idx = drills.findIndex((d) => d.id === drillId);
-  if (idx === -1) return undefined;
-  const updated: Drill = {
-    ...drills[idx],
-    comments: drills[idx].comments.filter((c) => c.id !== commentId),
-  };
-  drills[idx] = updated;
-  writeJson(DRILLS_KEY, drills);
-  return updated;
-}
-
-export function getPlans(): PracticePlan[] {
-  return readJson<PracticePlan[]>(PLANS_KEY, [])
-    .map(normalizePlan)
+export async function getPlans(): Promise<PracticePlan[]> {
+  const { data, error } = await supabase.from("practice_plans").select("*");
+  if (error) throw error;
+  return (data as PlanRow[])
+    .map(fromPlanRow)
     .sort((a, b) => Number(b.favorite) - Number(a.favorite) || b.updatedAt - a.updatedAt);
 }
 
-export function getPlan(id: string): PracticePlan | undefined {
-  return getPlans().find((p) => p.id === id);
+export async function getPlan(id: string): Promise<PracticePlan | undefined> {
+  const { data, error } = await supabase
+    .from("practice_plans")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? fromPlanRow(data as PlanRow) : undefined;
 }
 
-export function addPlan(input: PracticePlanInput): PracticePlan {
-  const now = Date.now();
-  const plan: PracticePlan = { ...input, id: makeId(), createdAt: now, updatedAt: now };
-  const plans = getPlans();
-  plans.push(plan);
-  writeJson(PLANS_KEY, plans);
-  return plan;
+export async function addPlan(input: PracticePlanInput): Promise<PracticePlan> {
+  const userId = await requireUserId();
+  const { data, error } = await supabase
+    .from("practice_plans")
+    .insert({ id: makeId(), user_id: userId, ...toPlanColumns(input) })
+    .select("*")
+    .single();
+  if (error) throw error;
+  return fromPlanRow(data as PlanRow);
 }
 
-export function updatePlan(
+export async function updatePlan(
   id: string,
   input: PracticePlanInput
-): PracticePlan | undefined {
-  const plans = getPlans();
-  const idx = plans.findIndex((p) => p.id === id);
-  if (idx === -1) return undefined;
-  const updated: PracticePlan = { ...plans[idx], ...input, updatedAt: Date.now() };
-  plans[idx] = updated;
-  writeJson(PLANS_KEY, plans);
-  return updated;
+): Promise<PracticePlan | undefined> {
+  const { data, error } = await supabase
+    .from("practice_plans")
+    .update({ ...toPlanColumns(input), updated_at: toIso(Date.now()) })
+    .eq("id", id)
+    .select("*")
+    .maybeSingle();
+  if (error) throw error;
+  return data ? fromPlanRow(data as PlanRow) : undefined;
 }
 
-export function deletePlan(id: string): void {
-  const plans = getPlans().filter((p) => p.id !== id);
-  writeJson(PLANS_KEY, plans);
+export async function deletePlan(id: string): Promise<void> {
+  const { error } = await supabase.from("practice_plans").delete().eq("id", id);
+  if (error) throw error;
 }
 
-export function toggleFavoritePlan(id: string): PracticePlan | undefined {
-  const plans = getPlans();
-  const idx = plans.findIndex((p) => p.id === id);
-  if (idx === -1) return undefined;
-  const updated: PracticePlan = { ...plans[idx], favorite: !plans[idx].favorite };
-  plans[idx] = updated;
-  writeJson(PLANS_KEY, plans);
-  return updated;
+export async function toggleFavoritePlan(id: string): Promise<PracticePlan | undefined> {
+  const existing = await getPlan(id);
+  if (!existing) return undefined;
+  const { data, error } = await supabase
+    .from("practice_plans")
+    .update({ favorite: !existing.favorite, updated_at: toIso(Date.now()) })
+    .eq("id", id)
+    .select("*")
+    .maybeSingle();
+  if (error) throw error;
+  return data ? fromPlanRow(data as PlanRow) : undefined;
 }
-

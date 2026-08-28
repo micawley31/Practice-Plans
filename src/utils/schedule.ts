@@ -14,8 +14,9 @@ export function formatClock(totalMinutes: number): string {
   return `${h12}:${String(m).padStart(2, "0")} ${period}`;
 }
 
-/** A segment runs as long as its longest parallel track (courts sync back up). */
+/** A drill segment runs as long as its longest parallel track (courts sync back up). */
 export function segmentDuration(segment: PlanSegment): number {
+  if (segment.kind === "break") return segment.duration;
   return segment.tracks.reduce((max, t) => Math.max(max, t.duration), 0);
 }
 

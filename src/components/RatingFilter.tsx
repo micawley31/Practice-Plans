@@ -1,3 +1,5 @@
+import { StarIcon } from "./icons";
+
 interface Props {
   value: number;
   onChange: (value: number) => void;
@@ -22,7 +24,10 @@ export function RatingFilter({ value, onChange }: Props) {
             className={value === n ? "chip chip-active" : "chip"}
             onClick={() => onChange(n)}
           >
-            {n}★+
+            <span className="icon-label">
+              {n}
+              <StarIcon />+
+            </span>
           </button>
         ))}
       </div>

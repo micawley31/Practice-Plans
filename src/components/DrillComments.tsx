@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
-import * as db from "../storage/db";
+import { useAuth } from "../contexts/AuthContext";
 import type { DrillComment } from "../types";
+import { XIcon } from "./icons";
 
 interface Props {
   comments: DrillComment[];
@@ -10,7 +11,8 @@ interface Props {
 
 export function DrillComments({ comments, onAdd, onDelete }: Props) {
   const [text, setText] = useState("");
-  const activeProfile = db.getActiveProfile();
+  const { displayName, user } = useAuth();
+  const postingAs = displayName ?? user?.email ?? "you";
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -43,7 +45,7 @@ export function DrillComments({ comments, onAdd, onDelete }: Props) {
                   onClick={() => onDelete(c.id)}
                   aria-label="Delete comment"
                 >
-                  ✕
+                  <XIcon />
                 </button>
               </div>
               <p className="comment-text">{c.text}</p>
@@ -53,7 +55,7 @@ export function DrillComments({ comments, onAdd, onDelete }: Props) {
       )}
       <form className="form" onSubmit={handleSubmit}>
         <label className="field">
-          <span>Add a comment (posting as {activeProfile.name})</span>
+          <span>Add a comment (posting as {postingAs})</span>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}

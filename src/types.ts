@@ -24,10 +24,32 @@ export interface DrillComment {
   createdAt: number;
 }
 
-export interface Profile {
+/** A player marker placed on a drill diagram. Coordinates are in the
+ * diagram's own 0-100 x 0-50 unit space (see components/CourtDiagram.tsx),
+ * not pixels, so the diagram scales cleanly at any display size. */
+export interface DiagramPlayer {
   id: string;
-  name: string;
-  createdAt: number;
+  x: number;
+  y: number;
+  label: string;
+}
+
+/** A straight movement/ball-path arrow on a drill diagram, same unit space
+ * as DiagramPlayer. */
+export interface DiagramArrow {
+  id: string;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
+
+/** A hand-drawn court diagram for a drill: player positions + movement
+ * arrows, stored as vector data (not an image) so it stays tiny in
+ * localStorage and renders crisply at any size. */
+export interface DrillDiagram {
+  players: DiagramPlayer[];
+  arrows: DiagramArrow[];
 }
 
 export interface Drill {
@@ -40,6 +62,9 @@ export interface Drill {
   duration: number;
   participants?: string;
   equipment?: string;
+  /** A link to an external video (YouTube, Vimeo, etc.) demonstrating the drill. */
+  videoUrl?: string;
+  diagram?: DrillDiagram;
   /** Maps an anonymous per-device rater id to their 1-5 star rating. */
   ratings: Record<string, number>;
   comments: DrillComment[];
@@ -67,10 +92,21 @@ export interface PlanTrack {
  * parallel — and the segment's length is the longest of its tracks, since
  * the whole team regroups once every court is done.
  */
-export interface PlanSegment {
+export interface DrillSegment {
   segmentId: string;
+  kind: "drill";
   tracks: PlanTrack[];
 }
+
+/** A rest/water break block — a time slot with no drill attached. */
+export interface BreakSegment {
+  segmentId: string;
+  kind: "break";
+  label: string;
+  duration: number;
+}
+
+export type PlanSegment = DrillSegment | BreakSegment;
 
 export interface PracticePlan {
   id: string;

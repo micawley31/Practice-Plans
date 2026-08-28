@@ -1,15 +1,55 @@
 :root {
-  --color-bg: #f5f7fa;
+  /* Material 3–inspired color roles. Hand-authored tonal values (not the
+     literal M3 HCT/dynamic-color algorithm) built around a violet-indigo
+     seed, following M3's container/on-container pairing convention:
+     each "container" is a light tonal fill, its "on-container" a dark,
+     high-contrast version of the same hue for text on top of it. */
+  --color-primary: #5b4fe8;
+  --color-primary-dark: #4a3fd1;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #e4dfff;
+  --color-on-primary-container: #1b0068;
+
+  --color-secondary-container: #e2e0f9;
+  --color-on-secondary-container: #1a1b2e;
+
+  --color-danger: #ba1a1a;
+  --color-danger-dark: #93000a;
+  --color-danger-container: #ffdad6;
+  --color-on-danger-container: #410002;
+
+  --color-success: #146c2e;
+  --color-success-container: #c4f6cb;
+  --color-on-success-container: #002106;
+
+  --color-warning-container: #fffbeb;
+  --color-on-warning-container: #b45309;
+
+  --color-bg: #f7f6fc;
   --color-surface: #ffffff;
-  --color-border: #dfe4ea;
-  --color-text: #1f2933;
-  --color-text-muted: #64748b;
-  --color-primary: #2563eb;
-  --color-primary-dark: #1d4ed8;
-  --color-danger: #dc2626;
-  --color-danger-dark: #b91c1c;
-  --radius: 10px;
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --color-surface-variant: #e9e6f2;
+  --color-surface-dim: #f6f5fa;
+  --color-border: #cac4d0;
+  --color-outline: #79747e;
+  --color-text: #1c1b1f;
+  --color-text-muted: #49454f;
+
+  --radius: 16px;
+  --radius-sm: 8px;
+  --radius-xl: 28px;
+  --radius-full: 999px;
+
+  --elevation-1:
+    0 1px 2px rgba(28, 27, 31, 0.08),
+    0 1px 3px 1px rgba(28, 27, 31, 0.06);
+  --elevation-2:
+    0 1px 2px rgba(28, 27, 31, 0.08),
+    0 2px 6px 2px rgba(28, 27, 31, 0.08);
+  --elevation-3:
+    0 1px 3px rgba(28, 27, 31, 0.12),
+    0 4px 8px 3px rgba(28, 27, 31, 0.1);
+
+  font-family: "Roboto", system-ui, -apple-system, sans-serif;
   color-scheme: light;
 }
 
@@ -17,10 +57,69 @@
   box-sizing: border-box;
 }
 
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: 2rem;
+  line-height: 1.25;
+}
+
+h2 {
+  font-size: 1.375rem;
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: 1.125rem;
+  line-height: 1.35;
+}
+
+.icon {
+  display: inline-block;
+  vertical-align: -0.15em;
+  flex-shrink: 0;
+}
+
+.icon-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 body {
   margin: 0;
   background: var(--color-bg);
   color: var(--color-text);
+  overflow-x: hidden;
+}
+
+/* Thin, unobtrusive scrollbars for the app's scrollable panes. */
+.drill-drawer-body,
+.modal {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-outline) transparent;
+}
+
+.drill-drawer-body::-webkit-scrollbar,
+.modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.drill-drawer-body::-webkit-scrollbar-track,
+.modal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.drill-drawer-body::-webkit-scrollbar-thumb,
+.modal::-webkit-scrollbar-thumb {
+  background: var(--color-outline);
+  border-radius: var(--radius-full);
 }
 
 .app {
@@ -89,7 +188,7 @@ body {
 
 .nav-link.active,
 .nav-link:hover {
-  background: #eef2ff;
+  background: var(--color-primary-container);
   color: var(--color-primary);
 }
 
@@ -125,11 +224,17 @@ body {
 
 .search-input {
   width: 100%;
-  padding: 10px 14px;
+  padding: 10px 16px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-full);
   font-size: 1rem;
   margin-bottom: 12px;
+  transition: border-color 0.15s ease;
+}
+
+.search-input:focus {
+  border-color: var(--color-primary);
+  outline: none;
 }
 
 .drill-filter-bar {
@@ -139,12 +244,71 @@ body {
   margin-bottom: 20px;
 }
 
+.filter-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-toggle-btn {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+  padding: 4px 0;
+}
+
+.filter-toggle-btn:hover {
+  color: var(--color-primary);
+}
+
+.filter-toggle-chevron {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+.filter-badge-count {
+  background: var(--color-primary);
+  color: white;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  line-height: 1.4;
+}
+
+.filter-clear-all {
+  all: unset;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  text-decoration: underline;
+}
+
+.filter-clear-all:hover {
+  color: var(--color-danger);
+}
+
+.filter-panel {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .filter-group {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 8px;
+  min-width: 0;
 }
 
 .filter-group-label {
@@ -164,10 +328,19 @@ body {
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text-muted);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   padding: 6px 14px;
   font-size: 0.85rem;
   cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.chip:not(.chip-active):hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .chip-active {
@@ -176,33 +349,69 @@ body {
   color: white;
 }
 
+/* M3 "Outlined button" — the default. Transparent fill, primary-colored
+   label, a neutral outline. Hover/press use a translucent primary "state
+   layer" over the transparent background rather than a hard color swap. */
 .btn {
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
-  border-radius: var(--radius);
-  padding: 9px 16px;
+  border: 1px solid var(--color-outline);
+  background: transparent;
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  padding: 10px 20px;
   font-size: 0.95rem;
   cursor: pointer;
   font-weight: 600;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
 }
 
 .btn:hover {
-  background: #f1f5f9;
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
 }
 
+.btn:active {
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  transform: scale(0.98);
+}
+
+/* M3 "Filled button" — solid primary fill, elevates slightly on hover. */
 .btn-primary {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: white;
+  color: var(--color-on-primary);
+  box-shadow: var(--elevation-1);
 }
 
 .btn-primary:hover {
   background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  box-shadow: var(--elevation-2);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  box-shadow: var(--elevation-1);
+  transform: translateY(0) scale(0.98);
+}
+
+/* M3 "Text button" — lowest-emphasis action: no border, no fill, just a
+   colored label with a subtle state layer on hover. Use for secondary
+   actions that shouldn't compete with a page's primary action. */
+.btn-text {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-primary);
+  padding: 10px 14px;
+}
+
+.btn-text:hover {
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
 }
 
 .btn-danger {
-  background: var(--color-surface);
+  background: transparent;
   border-color: var(--color-danger);
   color: var(--color-danger);
 }
@@ -214,11 +423,16 @@ body {
 
 .btn-icon {
   border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  border-radius: 6px;
+  background: transparent;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   padding: 6px 10px;
   line-height: 1;
+  transition: background-color 0.15s ease;
+}
+
+.btn-icon:hover {
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
 }
 
 .btn-icon:disabled {
@@ -226,9 +440,118 @@ body {
   cursor: not-allowed;
 }
 
+.btn-icon-danger {
+  border: none;
+  background: transparent;
+  color: var(--color-danger);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 6px 10px;
+  line-height: 1;
+  transition: background-color 0.15s ease;
+}
+
+.btn-icon-danger:hover {
+  background: var(--color-danger-container);
+  color: var(--color-danger-dark);
+}
+
 .fav-active {
   color: #b45309;
   border-color: #f59e0b;
+}
+
+.fav-star {
+  color: var(--color-text-muted);
+}
+
+.push-right {
+  margin-left: auto;
+}
+
+.toast-stack {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 40;
+  align-items: center;
+}
+
+.toast {
+  background: var(--color-text);
+  color: white;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  box-shadow: var(--elevation-3);
+}
+
+.badge-in-plan {
+  background: var(--color-success-container);
+  color: var(--color-on-success-container);
+}
+
+.search-input-wrapper {
+  position: relative;
+}
+
+.search-input-wrapper .search-input {
+  padding-right: 34px;
+}
+
+.search-clear-btn {
+  all: unset;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 4px 6px;
+  line-height: 1;
+}
+
+.search-clear-btn:hover {
+  color: var(--color-text);
+}
+
+.plan-segment-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.plan-segment-title-btn {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.plan-segment-title-text {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.plan-segment-title-btn:hover .plan-segment-title-text {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.info-icon {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
+.plan-segment-title-btn:hover .info-icon {
+  color: var(--color-primary);
 }
 
 .empty-state {
@@ -238,6 +561,18 @@ body {
   background: var(--color-surface);
   border: 1px dashed var(--color-border);
   border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.empty-state-icon {
+  color: var(--color-outline);
+}
+
+.empty-state p {
+  margin: 0;
 }
 
 .empty-state-inline {
@@ -248,17 +583,51 @@ body {
 
 .drill-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: 14px;
+  min-width: 0;
+}
+
+.create-drill-card {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 12px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  text-align: center;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.create-drill-card:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-container);
 }
 
 .drill-card {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius);
+  box-shadow: var(--elevation-1);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.drill-card:hover {
+  box-shadow: var(--elevation-2);
+  transform: translateY(-2px);
 }
 
 .drill-card-main {
@@ -274,15 +643,18 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .drill-card-name {
   font-weight: 700;
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 .badge {
-  background: #eef2ff;
+  background: var(--color-primary-container);
   color: var(--color-primary);
   border-radius: 999px;
   padding: 2px 10px;
@@ -298,18 +670,72 @@ body {
 }
 
 .badge-difficulty.badge-beginner {
-  background: #ecfdf5;
-  color: #047857;
+  background: var(--color-success-container);
+  color: var(--color-on-success-container);
 }
 
 .badge-difficulty.badge-intermediate {
-  background: #fffbeb;
-  color: #b45309;
+  background: var(--color-warning-container);
+  color: var(--color-on-warning-container);
 }
 
 .badge-difficulty.badge-advanced {
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--color-danger-container);
+  color: var(--color-on-danger-container);
+}
+
+/* One distinct tonal color per drill category, so the library/schedule can
+   be scanned by category at a glance instead of every badge reading the
+   same flat indigo. Same container/on-container pairing convention as the
+   rest of the token system. */
+.badge-category-warm-up {
+  background: #ffe4c7;
+  color: #7a3b00;
+}
+
+.badge-category-serving {
+  background: #dbe4ff;
+  color: #1c3aa9;
+}
+
+.badge-category-passing-receiving {
+  background: #c8f7ef;
+  color: #0a6b5c;
+}
+
+.badge-category-setting {
+  background: #f3e1ff;
+  color: #7318a3;
+}
+
+.badge-category-attacking {
+  background: #ffdce1;
+  color: #a30d33;
+}
+
+.badge-category-blocking {
+  background: #e2e8f4;
+  color: #33415c;
+}
+
+.badge-category-defense-digging {
+  background: #ffe9b3;
+  color: #7a4b00;
+}
+
+.badge-category-ball-control {
+  background: #c8f1fb;
+  color: #04617a;
+}
+
+.badge-category-conditioning {
+  background: #e3f6bf;
+  color: #3f6212;
+}
+
+.badge-category-team-scrimmage {
+  background: #ffd9ec;
+  color: #99155c;
 }
 
 .star-rating {
@@ -356,6 +782,10 @@ body {
   margin: 0;
   color: var(--color-text-muted);
   font-size: 0.9rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 
 .drill-card-meta {
@@ -372,9 +802,9 @@ body {
 }
 
 .tag {
-  background: #f1f5f9;
-  color: var(--color-text-muted);
-  border-radius: 6px;
+  background: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+  border-radius: var(--radius-sm);
   padding: 2px 8px;
   font-size: 0.75rem;
 }
@@ -396,7 +826,8 @@ body {
 
 .modal {
   background: var(--color-surface);
-  border-radius: var(--radius);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--elevation-3);
   max-width: 560px;
   width: 100%;
   max-height: 90vh;
@@ -426,7 +857,7 @@ body {
 }
 
 .form-error {
-  background: #fef2f2;
+  background: var(--color-danger-container);
   color: var(--color-danger-dark);
   padding: 10px 14px;
   border-radius: var(--radius);
@@ -475,6 +906,134 @@ body {
   gap: 14px;
 }
 
+.video-embed-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-text);
+}
+
+.video-embed-wrapper iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.video-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.video-link:hover {
+  text-decoration: underline;
+}
+
+.court-diagram {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  background: var(--color-surface-dim);
+  border-radius: var(--radius-sm);
+}
+
+.diagram-canvas {
+  cursor: crosshair;
+  touch-action: none;
+  border: 1px solid var(--color-border);
+}
+
+.court-diagram-boundary {
+  fill: var(--color-surface);
+  stroke: var(--color-outline);
+  stroke-width: 0.4;
+}
+
+.court-diagram-net {
+  stroke: var(--color-text-muted);
+  stroke-width: 0.5;
+  stroke-dasharray: 1.2 1;
+}
+
+.court-diagram-attack-line {
+  stroke: var(--color-border);
+  stroke-width: 0.3;
+}
+
+.court-diagram-arrow {
+  stroke: var(--color-primary);
+  stroke-width: 0.6;
+  stroke-linecap: round;
+  fill: none;
+}
+
+.court-diagram-arrow-draft {
+  opacity: 0.6;
+  stroke-dasharray: 1.5 1;
+}
+
+.court-diagram-arrow-hit {
+  stroke: transparent;
+  stroke-width: 3;
+  cursor: pointer;
+}
+
+.court-diagram-arrowhead-fill {
+  fill: var(--color-primary);
+}
+
+.court-diagram-player-group {
+  cursor: grab;
+}
+
+.court-diagram-player {
+  fill: var(--color-primary);
+  stroke: var(--color-surface);
+  stroke-width: 0.4;
+}
+
+.court-diagram-player-label {
+  fill: var(--color-on-primary);
+  font-size: 3px;
+  font-weight: 700;
+  pointer-events: none;
+  user-select: none;
+}
+
+.diagram-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.diagram-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diagram-preview {
+  margin-top: 6px;
+  max-width: 320px;
+}
+
+.diagram-field-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
 .drill-detail-description {
   margin: 0;
   color: var(--color-text);
@@ -510,9 +1069,14 @@ body {
   align-items: center;
   gap: 10px;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius);
+  box-shadow: var(--elevation-1);
   padding: 4px;
+  transition: box-shadow 0.15s ease;
+}
+
+.plan-list-item:hover {
+  box-shadow: var(--elevation-2);
 }
 
 .plan-list-main {
@@ -525,53 +1089,326 @@ body {
   padding: 12px 14px;
 }
 
-.plan-builder-layout {
+.plan-builder-grid {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns: 1fr 380px;
   gap: 24px;
   align-items: start;
   margin-top: 20px;
 }
 
-.plan-builder-column {
+.plan-builder-main {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius);
+  box-shadow: var(--elevation-1);
   padding: 16px;
 }
 
-.plan-builder-column h2 {
+.plan-builder-main h2 {
   margin-top: 0;
 }
 
-.plan-meta {
+.plan-builder-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.plan-builder-column-header h2 {
+  margin: 0;
+}
+
+.break-insert-slot {
+  display: flex;
+  justify-content: center;
+}
+
+.break-insert-btn {
+  all: unset;
+  cursor: pointer;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1px dashed var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 12px;
+}
+
+.break-insert-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-container);
+}
+
+.plan-segment-break {
+  border-style: dashed;
+}
+
+.break-label-input {
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 2px 6px;
+  margin: -2px 0 -2px -6px;
+  background: transparent;
+  width: 100%;
+}
+
+.break-label-input:hover,
+.break-label-input:focus {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+}
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 15;
+}
+
+.drill-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(420px, 92vw);
+  background: var(--color-surface);
+  box-shadow: -4px 0 24px rgba(15, 23, 42, 0.2);
+  display: flex;
+  flex-direction: column;
+  animation: drawer-slide-in 0.2s ease-out;
+}
+
+@keyframes drawer-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.drill-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.drill-drawer-header h2 {
+  margin: 0;
+}
+
+.drill-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--color-bg);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--elevation-2);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.auth-brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+}
+
+.auth-card h1 {
+  margin: 0 0 4px;
+  font-size: 1.4rem;
+}
+
+.auth-card .page-subtitle {
+  margin: 0 0 16px;
+}
+
+.auth-card .form {
+  margin-bottom: 4px;
+}
+
+.auth-form-actions {
+  justify-content: stretch;
+}
+
+.auth-form-actions .btn {
+  width: 100%;
+}
+
+.auth-info {
+  background: var(--color-success-container);
+  color: var(--color-on-success-container);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.auth-switch {
+  margin-top: 16px;
+  align-self: center;
+}
+
+@media (max-width: 640px) {
+  .drill-drawer {
+    width: 100%;
+  }
+}
+
+.plan-builder-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 84px;
+}
+
+/* M3 "Filled card" — tonal fill, no border or shadow, distinct from the
+   elevated (shadowed) cards elsewhere so the sidebar reads as a grouped,
+   flatter surface. */
+.sidebar-card {
+  background: var(--color-surface-variant);
   border-radius: var(--radius);
   padding: 16px;
 }
 
-.schedule-summary {
+.sidebar-card h2 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+
+.btn-block {
+  width: 100%;
+  text-align: center;
+}
+
+.stat-row-list {
+  margin: 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 10px 16px;
-  margin-bottom: 20px;
-  font-size: 0.88rem;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+
+.stat-row dt {
   color: var(--color-text-muted);
 }
 
-.schedule-summary-over {
-  border-color: var(--color-danger);
+.stat-row dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+.stat-value-over {
   color: var(--color-danger-dark);
 }
 
-.schedule-summary-exact {
-  border-color: #10b981;
-  color: #047857;
+.stat-value-exact {
+  color: var(--color-success);
+}
+
+.stat-bars {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+
+.stat-bar-label {
+  width: 108px;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stat-bar-track {
+  flex: 1;
+  background: var(--color-surface-variant);
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  display: block;
+  background: var(--color-primary);
+  height: 100%;
+  border-radius: 999px;
+}
+
+.stat-bar-value {
+  width: 52px;
+  flex-shrink: 0;
+  text-align: right;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .plan-builder-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-builder-sidebar {
+    position: static;
+  }
 }
 
 .plan-segment-list {
@@ -584,12 +1421,23 @@ body {
 }
 
 .plan-segment {
+  background: var(--color-surface-dim);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
+  box-shadow: var(--elevation-1);
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.plan-segment-pills {
+  margin-top: 6px;
+}
+
+.plan-segment-pills .badge {
+  padding: 6px 16px;
+  font-size: 0.9rem;
 }
 
 .plan-segment-header {
@@ -610,6 +1458,7 @@ body {
   flex-direction: column;
   gap: 2px;
   flex: 1;
+  min-width: 0;
 }
 
 .plan-segment-title {
@@ -629,9 +1478,6 @@ body {
 }
 
 .plan-track {
-  background: #f8fafc;
-  border-radius: 8px;
-  padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -651,10 +1497,55 @@ body {
   width: fit-content;
 }
 
-@media (max-width: 900px) {
-  .plan-builder-layout {
-    grid-template-columns: 1fr;
-  }
+.plan-segment-duration {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.duration-separator {
+  color: var(--color-border);
+}
+
+.btn-icon-plain {
+  all: unset;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 2px 4px;
+  line-height: 1;
+  font-size: 0.85rem;
+}
+
+.btn-icon-plain:hover {
+  color: var(--color-primary);
+}
+
+.segment-duration-input {
+  width: 56px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  padding: 2px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+
+.plan-track-drill-name {
+  all: unset;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.plan-track-drill-name:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.plan-track-drill-missing {
+  font-weight: 700;
+  color: var(--color-text-muted);
+  font-style: italic;
 }
 
 .divider {
@@ -677,7 +1568,7 @@ body {
 }
 
 .comment-item {
-  background: #f8fafc;
+  background: var(--color-surface-dim);
   border-radius: 8px;
   padding: 10px 12px;
 }
