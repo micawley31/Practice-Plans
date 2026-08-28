@@ -1,4 +1,4 @@
-import { useAuth } from "../contexts/AuthContext";
+import { useActiveProfile } from "../contexts/ActiveProfileContext";
 import type { Drill } from "../types";
 import { categorySlug } from "../utils/categorySlug";
 import { getAverageRating, getMyRating } from "../utils/rating";
@@ -28,9 +28,9 @@ export function DrillDetailModal({
   onDeleteComment,
   action,
 }: Props) {
-  const { user } = useAuth();
+  const { activeProfile } = useActiveProfile();
   const { average, count } = getAverageRating(drill);
-  const myRating = user ? getMyRating(drill, user.id) : undefined;
+  const myRating = activeProfile ? getMyRating(drill, activeProfile.id) : undefined;
 
   return (
     <Modal title={drill.name} onClose={onClose}>

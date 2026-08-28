@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useActiveProfile } from "../contexts/ActiveProfileContext";
 import type { DrillComment } from "../types";
 import { XIcon } from "./icons";
 
@@ -11,8 +11,8 @@ interface Props {
 
 export function DrillComments({ comments, onAdd, onDelete }: Props) {
   const [text, setText] = useState("");
-  const { displayName, user } = useAuth();
-  const postingAs = displayName ?? user?.email ?? "you";
+  const { activeProfile } = useActiveProfile();
+  const postingAs = activeProfile?.name ?? "you";
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();

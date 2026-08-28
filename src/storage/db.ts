@@ -6,16 +6,60 @@ import type {
   PlanSegment,
   PracticePlan,
   PracticePlanInput,
+  Profile,
 } from "../types";
+
+const ACTIVE_PROFILE_KEY = "practice-plans:activeProfileId";
 
 export function makeId(): string {
   return crypto.randomUUID();
 }
 
-async function requireUserId(): Promise<string> {
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) throw new Error("Not signed in");
-  return data.user.id;
+export function getActiveProfileId(): string | null {
+  return localStorage.getItem(ACTIVE_PROFILE_KEY);
+}
+
+export function setActiveProfileId(id: string): void {
+  localStorage.setItem(ACTIVE_PROFILE_KEY, id);
+}
+
+function requireActiveProfileId(): string {
+  const id = getActiveProfileId();
+  if (!id) throw new Error("No active profile selected");
+  return id;
+}
+
+interface ProfileRow {
+  id: string;
+  display_name: string;
+  created_at: string;
+}
+
+function fromProfileRow(row: ProfileRow): Profile {
+  return { id: row.id, name: row.display_name, createdAt: toEpochMs(row.created_at) };
+}
+
+export async function getProfiles(): Promise<Profile[]> {
+  const { data, error } = await supabase.from("profiles").select("*").order("created_at");
+  if (error) throw error;
+  return (data as ProfileRow[]).map(fromProfileRow);
+}
+
+export async function createProfile(name: string): Promise<Profile> {
+  const { data, error } = await supabase
+    .from("profiles")
+    .insert({ id: makeId(), display_name: name })
+    .select("*")
+    .single();
+  if (error) throw error;
+  const profile = fromProfileRow(data as ProfileRow);
+  setActiveProfileId(profile.id);
+  return profile;
+}
+
+export async function renameProfile(id: string, name: string): Promise<void> {
+  const { error } = await supabase.from("profiles").update({ display_name: name }).eq("id", id);
+  if (error) throw error;
 }
 
 function toEpochMs(iso: string): number {
@@ -136,10 +180,9 @@ export async function getDrill(id: string): Promise<Drill | undefined> {
 }
 
 export async function addDrill(input: DrillInput): Promise<Drill> {
-  const userId = await requireUserId();
   const { data, error } = await supabase
     .from("drills")
-    .insert({ id: makeId(), ...toDrillColumns(input), created_by: userId })
+    .insert({ id: makeId(), ...toDrillColumns(input), created_by: getActiveProfileId() })
     .select(DRILL_SELECT)
     .single();
   if (error) throw error;
@@ -163,7 +206,7 @@ export async function deleteDrill(id: string): Promise<void> {
 }
 
 export async function rateDrill(id: string, score: number): Promise<Drill | undefined> {
-  const userId = await requireUserId();
+  const userId = requireActiveProfileId();
   const { error } = await supabase
     .from("drill_ratings")
     .upsert({ drill_id: id, user_id: userId, score }, { onConflict: "drill_id,user_id" });
@@ -172,7 +215,7 @@ export async function rateDrill(id: string, score: number): Promise<Drill | unde
 }
 
 export async function addComment(drillId: string, text: string): Promise<Drill | undefined> {
-  const userId = await requireUserId();
+  const userId = requireActiveProfileId();
   const { error } = await supabase
     .from("drill_comments")
     .insert({ drill_id: drillId, user_id: userId, text });
@@ -228,7 +271,9 @@ function toPlanColumns(input: PracticePlanInput) {
 }
 
 export async function getPlans(): Promise<PracticePlan[]> {
-  const { data, error } = await supabase.from("practice_plans").select("*");
+  const profileId = getActiveProfileId();
+  if (!profileId) return [];
+  const { data, error } = await supabase.from("practice_plans").select("*").eq("user_id", profileId);
   if (error) throw error;
   return (data as PlanRow[])
     .map(fromPlanRow)
@@ -246,7 +291,7 @@ export async function getPlan(id: string): Promise<PracticePlan | undefined> {
 }
 
 export async function addPlan(input: PracticePlanInput): Promise<PracticePlan> {
-  const userId = await requireUserId();
+  const userId = requireActiveProfileId();
   const { data, error } = await supabase
     .from("practice_plans")
     .insert({ id: makeId(), user_id: userId, ...toPlanColumns(input) })

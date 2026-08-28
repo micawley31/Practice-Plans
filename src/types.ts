@@ -24,6 +24,12 @@ export interface DrillComment {
   createdAt: number;
 }
 
+export interface Profile {
+  id: string;
+  name: string;
+  createdAt: number;
+}
+
 /** A player marker placed on a drill diagram. Coordinates are in the
  * diagram's own 0-100 x 0-50 unit space (see components/CourtDiagram.tsx),
  * not pixels, so the diagram scales cleanly at any display size. */
